@@ -10,12 +10,21 @@ namespace AnimalGuesser
         public string QuestionText { get; set; }
         public string Result { get; set; }
 
+        [JsonConstructor]
         public Question(Question positiv, Question negative, string questionText, string result)
         {
             QuestionText = questionText;
             Result = result;
             PositiveResponse = positiv;
             NegativeResponse = negative;
+        }
+
+        public Question(Question clone)
+        {
+            PositiveResponse = clone.PositiveResponse;
+            NegativeResponse = clone.NegativeResponse;
+            QuestionText = clone.QuestionText;
+            Result = clone.Result;
         }
 
         public void ExecuteQuestion()
@@ -43,22 +52,47 @@ namespace AnimalGuesser
             Console.WriteLine("Что отличает загаданый оъект?");
             string objectCharacteristic = Console.ReadLine() ?? "";
 
-            var newNode = new Question(null, null, "Это "+ guesedObject+"?", guesedObject);
-            NegativeResponse = new Question(newNode, null, objectCharacteristic + "?", "");
+            NegativeResponse = new Question(this);
+            PositiveResponse = new Question(null, null, "Это " + guesedObject + "?", guesedObject);
+            QuestionText = objectCharacteristic;
+            Result = "";
         }
     }
 
     static class Program
     {
+        public static string fileName = "QuestionBase.json";
+        public static string deflt = "{\"PositiveResponse\":null,\"NegativeResponse\":null,\"QuestionText\":\"Это слон\",\"Result\":\"Слон\"}";
+        public static void Save(Question toSave)
+        {
+            string jsonString = JsonConvert.SerializeObject(toSave);
+            File.WriteAllText(fileName, jsonString);
+        }
+
+        public static void Drop()
+        {
+            File.WriteAllText(fileName, deflt);
+        }
+
+        public static Question Read()
+        {
+            Question quest = null;
+            try
+            {
+                quest = JsonConvert.DeserializeObject<Question>(File.ReadAllText(fileName));
+            }
+            catch (Exception ex)
+            {
+                quest = new Question(null, null, "Это слон", "Слон");
+            }
+            return quest;
+        }
+
         static void Main()
         {
-            const string fileName = "QuestionBase.json";
-            var currentNode = JsonConvert.DeserializeObject<Question>(File.ReadAllText(fileName));
+            var currentNode = Read();
             currentNode.ExecuteQuestion();
-
-            string jsonString = JsonConvert.SerializeObject(currentNode);
-            File.WriteAllText(fileName, jsonString);
-            Console.WriteLine(File.ReadAllText(fileName));
+            Save(currentNode);
         }
     }
 }
