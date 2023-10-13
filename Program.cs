@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
+
+//Вариант 7: Транспортные средства
 
 namespace AnimalGuesser
 {
@@ -14,7 +15,7 @@ namespace AnimalGuesser
         public Question(Question positiv, Question negative, string questionText, string result)
         {
             QuestionText = questionText;
-            Result = result;
+            Result = result ?? "";
             PositiveResponse = positiv;
             NegativeResponse = negative;
         }
@@ -62,7 +63,7 @@ namespace AnimalGuesser
     static class Program
     {
         public static string fileName = "QuestionBase.json";
-        public static string deflt = "{\"PositiveResponse\":null,\"NegativeResponse\":null,\"QuestionText\":\"Это слон\",\"Result\":\"Слон\"}";
+        public static string deflt = "{\"PositiveResponse\":null,\"NegativeResponse\":null,\"QuestionText\":\"Это самолёт\",\"Result\":\"Самолёт\"}";
         public static void Save(Question toSave)
         {
             string jsonString = JsonConvert.SerializeObject(toSave);
@@ -83,16 +84,36 @@ namespace AnimalGuesser
             }
             catch (Exception ex)
             {
-                quest = new Question(null, null, "Это слон", "Слон");
+                quest = new Question(null, null, "Это самолёт", "Самолёт");
             }
             return quest;
         }
 
+        public static void PrintTree(Question root, int depth)
+        {
+            if (root == null)
+                return;
+
+            depth += 5;
+
+            PrintTree(root.NegativeResponse, depth);
+
+            var outLine = new string(' ', depth) + root.QuestionText;
+            Console.WriteLine(root.Result.Length > 0 ? outLine + " -> " +root.Result : outLine);
+
+            PrintTree(root.PositiveResponse, depth);
+        }
+
         static void Main()
         {
-            var currentNode = Read();
-            currentNode.ExecuteQuestion();
-            Save(currentNode);
+            //while(true)
+            //{
+                var currentNode = Read();
+                currentNode.ExecuteQuestion();
+                Save(currentNode);
+                //Console.WriteLine("\n\n-----------Снова-------------\n\n");
+            //}
+            PrintTree(currentNode, 0);
         }
     }
 }
