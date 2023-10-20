@@ -106,14 +106,23 @@ namespace AnimalGuesser
 
         static void Main()
         {
-            //while(true)
-            //{
+            string key = "";
+            while(key != "3")
+            {
                 var currentNode = Read();
-                currentNode.ExecuteQuestion();
-                Save(currentNode);
-                //Console.WriteLine("\n\n-----------Снова-------------\n\n");
-            //}
-            PrintTree(currentNode, 0);
+                Console.WriteLine("1 - Выполнить\n2 - Вывести дерево\n3 - Выход");
+                key = Console.ReadLine();
+                switch(key) {
+                    case "1":
+                        currentNode.ExecuteQuestion();
+                        Save(currentNode);
+                        continue;
+                    case "2":
+                        PrintTree(currentNode,0);
+                        Save(currentNode);
+                        continue;
+                }
+            }
         }
     }
 }
